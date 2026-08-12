@@ -93,7 +93,7 @@ async function main() {
   console.log('Menyambungkan ke Telegram...');
   await client.start({
     phoneNumber: async () => input.text('Nomor Telegram (+62...): '),
-    password: async () => input.text('Password 2FA (kosong bila tidak ada): '),
+    password: async () => input.password('Password 2FA (kosong bila tidak ada): '),
     phoneCode: async () => input.text('Kode OTP Telegram: '),
     onError: (error) => console.error('Login error:', error.message)
   });
