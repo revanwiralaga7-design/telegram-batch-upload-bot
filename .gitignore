@@ -11,6 +11,9 @@ yarn-error.log*
 *.log
 .upload-state.json
 .upload-state.json.tmp
+.telegram-user.session
+.user-upload-state.json
+.user-upload-state.json.tmp
 
 # OS/editor files
 .DS_Store

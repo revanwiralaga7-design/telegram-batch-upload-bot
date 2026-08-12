@@ -40,6 +40,39 @@ npm run upload
 
 > Batas ukuran file tetap mengikuti limit Telegram dan jenis akun/bot. Bot ini tidak dapat melewati batas upload Telegram.
 
+## Upload file besar sebagai akun Telegram biasa (hingga limit akun)
+
+Mode `upload:user` mengirim file dari VPS memakai **akun Telegram Anda**, bukan bot. Ini cocok untuk file yang melampaui limit upload bot publik. Akun pengirim harus menjadi admin di channel tujuan (atau anggota grup dengan izin mengirim media).
+
+> Jangan gunakan mode ini untuk spam atau ke channel/grup yang bukan milik Anda. Telegram dapat menerapkan flood limit pada akun yang mengirim terlalu cepat. Script sudah memakai jeda dan akan mencoba ulang `FLOOD_WAIT` secara otomatis.
+
+1. Buka https://my.telegram.org/apps, login dengan nomor Telegram Anda, lalu buat aplikasi.
+2. Salin `api_id` dan `api_hash` ke `.env`:
+
+```env
+TELEGRAM_API_ID=12345678
+TELEGRAM_API_HASH=isi_api_hash_anda
+TARGET_CHAT_ID=@username_channel
+UPLOAD_DIR=/home/ubuntu/downloads
+```
+
+3. Instal dependency dan mulai upload:
+
+```bash
+npm install
+npm run upload:user
+```
+
+Pada eksekusi pertama, terminal meminta nomor Telegram, OTP, dan password 2FA jika aktif. File session login disimpan lokal pada `.telegram-user.session`; **jangan dibagikan atau diunggah ke GitHub**. Eksekusi berikutnya tidak perlu login ulang.
+
+Atau berikan folder langsung:
+
+```bash
+npm run upload:user -- /path/ke/folder
+```
+
+File tetap berada di VPS. Catatan file sukses berada di `.user-upload-state.json`, sehingga hanya file baru atau yang berubah yang dikirim pada eksekusi berikutnya.
+
 ## 1. Buat bot dan ambil token
 
 1. Buka Telegram lalu chat dengan [@BotFather](https://t.me/BotFather).
