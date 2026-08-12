@@ -9,6 +9,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.log
+.upload-state.json
+.upload-state.json.tmp
 
 # OS/editor files
 .DS_Store

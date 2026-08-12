@@ -8,6 +8,36 @@ Bot Node.js ini memungkinkan pengguna mengirim **banyak file tanpa upload satu p
 - Tidak mengunduh file ke server: bot memakai Telegram `copyMessages`, sehingga lebih cepat dan hemat storage server.
 - Satu batch mendukung lebih dari 100 file. Bot otomatis memecah panggilan API per 100 pesan.
 
+## Upload file langsung dari VPS (tanpa kirim ke bot dulu)
+
+Jika file sudah berada di VPS, Anda **tidak perlu mengirim file ke chat bot**. Jalankan uploader berikut dari VPS:
+
+```bash
+npm run upload -- /path/ke/folder
+```
+
+Contoh:
+
+```bash
+npm run upload -- /home/ubuntu/downloads
+```
+
+Seluruh file di folder tersebut, termasuk subfolder, akan dikirim sebagai dokumen ke `TARGET_CHAT_ID`. File dikirim otomatis satu per satu oleh script (bukan Anda secara manual), karena API Telegram memang menerima pengiriman file per pesan.
+
+Script menyimpan catatan sukses di `.upload-state.json`. Karena file sumber dipilih untuk **tetap berada di folder**, pada eksekusi berikutnya hanya file baru atau file yang berubah yang akan diunggah. Jangan hapus file state tersebut kecuali Anda memang ingin upload ulang seluruh folder.
+
+Alternatifnya, isi path permanen pada `.env`:
+
+```env
+UPLOAD_DIR=/home/ubuntu/downloads
+```
+
+Kemudian cukup jalankan:
+
+```bash
+npm run upload
+```
+
 > Batas ukuran file tetap mengikuti limit Telegram dan jenis akun/bot. Bot ini tidak dapat melewati batas upload Telegram.
 
 ## 1. Buat bot dan ambil token
