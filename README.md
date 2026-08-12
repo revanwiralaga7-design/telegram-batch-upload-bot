@@ -1,0 +1,84 @@
+# Bot Telegram Upload Batch
+
+Bot Node.js ini memungkinkan pengguna mengirim **banyak file tanpa upload satu per satu ke channel/grup tujuan**:
+
+- Kirim file biasa sebanyak apa pun → bot menampungnya → kirim `/selesai` → bot meneruskan seluruh antrean ke tujuan.
+- Kirim beberapa media sebagai **album Telegram** → bot meneruskannya otomatis setelah album lengkap diterima.
+- Mendukung dokumen, foto, video, audio, animasi/GIF, voice note, dan video note.
+- Tidak mengunduh file ke server: bot memakai Telegram `copyMessages`, sehingga lebih cepat dan hemat storage server.
+- Satu batch mendukung lebih dari 100 file. Bot otomatis memecah panggilan API per 100 pesan.
+
+> Batas ukuran file tetap mengikuti limit Telegram dan jenis akun/bot. Bot ini tidak dapat melewati batas upload Telegram.
+
+## 1. Buat bot dan ambil token
+
+1. Buka Telegram lalu chat dengan [@BotFather](https://t.me/BotFather).
+2. Jalankan `/newbot`, ikuti instruksi, lalu salin tokennya.
+
+## 2. Siapkan chat tujuan
+
+Buat/siapkan channel atau grup tujuan, lalu:
+
+1. Tambahkan bot sebagai **admin**.
+2. Beri izin untuk mengirim pesan/media.
+3. Tentukan `TARGET_CHAT_ID`:
+   - Channel publik: dapat memakai `@username_channel`.
+   - Grup/channel privat: gunakan ID numerik, biasanya diawali `-100`.
+
+Cara mudah mendapat ID chat: teruskan satu pesan dari chat tujuan ke bot seperti `@userinfobot`, atau gunakan bot ID checker tepercaya. Jangan pernah membagikan `BOT_TOKEN`.
+
+## 3. Instal dan konfigurasi
+
+Butuh Node.js 18 atau lebih baru.
+
+```bash
+cd telegram-batch-upload-bot
+npm install
+cp .env.example .env
+```
+
+Buka `.env`, lalu isi:
+
+```env
+BOT_TOKEN=token_dari_BotFather
+TARGET_CHAT_ID=-1001234567890
+ALLOWED_USER_IDS=123456789
+```
+
+`ALLOWED_USER_IDS` sangat dianjurkan supaya hanya akun Anda yang dapat mengirim file. Untuk lebih dari satu akun, pisahkan dengan koma:
+
+```env
+ALLOWED_USER_IDS=123456789,987654321
+```
+
+## 4. Jalankan
+
+```bash
+npm start
+```
+
+Untuk server/VPS agar tetap hidup setelah terminal ditutup, gunakan process manager seperti PM2:
+
+```bash
+npm i -g pm2
+pm2 start bot.js --name upload-batch-bot
+pm2 save
+pm2 startup
+```
+
+## Cara pakai di Telegram
+
+1. Buka chat pribadi dengan bot dan tekan **Start**.
+2. Kirim file satuan sebanyak yang diperlukan.
+3. Bot akan menampilkan jumlah antrean.
+4. Kirim `/selesai` untuk meneruskan semua file tersebut ke chat/channel tujuan.
+5. Jika salah kirim, gunakan `/batal` sebelum `/selesai`.
+
+Untuk album, pilih banyak foto/video/dokumen dari tombol lampiran Telegram lalu kirim sekaligus. Bot meneruskannya otomatis, sehingga tidak perlu mengetik `/selesai`.
+
+## Catatan keamanan dan keterbatasan
+
+- Jangan commit atau kirim file `.env`; file tersebut menyimpan token bot.
+- Jalankan bot di chat pribadi. Jika dipakai di grup, antrean dibedakan per grup, bukan per anggota.
+- Pesan yang diteruskan tidak menyertakan attribution "forwarded from" karena menggunakan metode salin (`copyMessages`).
+- Antrean disimpan di memori. Jika bot direstart sebelum `/selesai`, antrean yang belum dikirim akan hilang. Untuk antrean persisten, tambahkan Redis/database.
