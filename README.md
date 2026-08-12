@@ -73,6 +73,12 @@ npm run upload:user -- /path/ke/folder
 
 File tetap berada di VPS. Catatan file sukses berada di `.user-upload-state.json`, sehingga hanya file baru atau yang berubah yang dikirim pada eksekusi berikutnya.
 
+Secara default uploader memakai 4 koneksi upload paralel dan menampilkan progres per 5%. Untuk VPS yang terasa berat, turunkan di `.env`:
+
+```env
+USER_UPLOAD_WORKERS=2
+```
+
 ## 1. Buat bot dan ambil token
 
 1. Buka Telegram lalu chat dengan [@BotFather](https://t.me/BotFather).

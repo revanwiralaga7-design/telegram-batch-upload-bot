@@ -12,6 +12,7 @@ const target = process.env.TARGET_CHAT_ID;
 const uploadDir = process.argv[2] || process.env.UPLOAD_DIR;
 const sessionFile = process.env.USER_SESSION_FILE || path.join(__dirname, '.telegram-user.session');
 const stateFile = process.env.USER_STATE_FILE || path.join(__dirname, '.user-upload-state.json');
+const uploadWorkers = Math.max(1, Math.min(4, Number(process.env.USER_UPLOAD_WORKERS) || 4));
 
 if (!apiId || !apiHash || !target || !uploadDir) {
   console.error('Isi TELEGRAM_API_ID, TELEGRAM_API_HASH, TARGET_CHAT_ID, UPLOAD_DIR di .env.');
@@ -57,12 +58,21 @@ function floodWaitMs(error) {
 async function sendFileWithRetry(client, entity, filePath, caption) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
+      let lastPercent = -5;
       await client.sendFile(entity, {
         file: filePath,
         caption: caption.length <= 1024 ? caption : path.basename(filePath),
         forceDocument: true,
-        workers: 1
+        workers: uploadWorkers,
+        progressCallback: (progress) => {
+          const percent = Math.floor(progress * 100);
+          if (percent >= lastPercent + 5 || percent === 100) {
+            lastPercent = percent;
+            process.stdout.write(`\r  upload ${percent}%`);
+          }
+        }
       });
+      process.stdout.write('\r');
       return;
     } catch (error) {
       const wait = floodWaitMs(error);
